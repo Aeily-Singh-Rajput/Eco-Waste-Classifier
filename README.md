@@ -20,13 +20,6 @@ helping users make better disposal decisions.
 - ♻️ Suggests proper disposal method
 - 🌐 User-friendly interface
 
-  ## 🛠️ Tech Stack
-
-- Frontend: HTML, CSS, JavaScript
-- Backend: (if any, e.g. Python / Node.js)
-- AI/ML: (mention model or API if used)
-- Tools: VS Code, Git, GitHub
-
-  ## 📄 License
+## 📄 License
 
 This project is for educational purposes.
