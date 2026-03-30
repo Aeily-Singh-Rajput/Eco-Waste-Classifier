@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eco Waste Classifier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to right, #dcedc1, #a8e6cf);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+      overflow-x: auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+
+    header h1 {
+      color: #2e7d32;
+      font-size: 2em;
+      margin: 0;
+    }
+
+    header p {
+      color: #4f4f4f;
+      font-size: 1em;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      width: 100%;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .left, .right {
+      background: #ffffffdd;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      min-width: 300px;
+      border: 3px solid #a8e6cf;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .left h2, .right h2 {
+      margin: 5px 0 15px 0;
+      color: #2e7d32;
+      font-size: 1.2em;
+      text-align: center;
+    }
+
+    input[type="file"], input[type="text"] { display: block; }
+
+    label, button {
+      display: block;
+      padding: 10px 15px;
+      background: #2e7d32;
+      color: white;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px auto;
+      width: 80%;
+      text-align: center;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    label:hover, button:hover { background: #1b5e20; transform: scale(1.05); }
+
+    #preview {
+      margin-top: 15px;
+      max-width: 250px;
+      max-height: 250px;
+      border-radius: 15px;
+      border: 2px solid #2e7d32;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .url-box {
+      background: #e0f2f1;
+      border: 2px solid #2e7d32;
+      border-radius: 15px;
+      padding: 10px;
+      width: 100%;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .url-box input[type="text"] {
+      width: 90%;
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .result-card {
+      background: #e0f2f1;
+      border-left: 8px solid #2e7d32;
+      border-radius: 15px;
+      padding: 15px;
+      font-size: 1em;
+      width: 100%;
+    }
+
+    .prediction {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0;
+    }
+
+    .prediction span { font-weight: 700; }
+    .confidence-bar {
+      height: 20px;
+      border-radius: 10px;
+      background: #c8e6c9;
+      overflow: hidden;
+      flex: 1;
+      margin-left: 10px;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      background: #2e7d32;
+      text-align: right;
+      padding-right: 5px;
+      color: white;
+      font-weight: 600;
+      border-radius: 10px;
+    }
+
+    .recycle-icon {
+      font-size: 40px;
+      color: #2e7d32;
+      animation: spin 5s linear infinite;
+      display: block;
+      margin: 0 auto 5px auto;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    footer {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #2e7d32;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .container { flex-direction: column; align-items: center; }
+      .left, .right { max-width: 90%; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="recycle-icon">♻️</div>
+  <h1>Eco Waste Classifier</h1>
+  <p>Classify waste as <strong>Recyclable ♻️</strong> or <strong>Non-Recyclable 🚫</strong></p>
+</header>
+
+<div class="container">
+  <!-- Left: Credentials + Upload + URL + preview -->
+  <div class="left">
+    <h2>Enter Azure Custom Vision Credentials</h2>
+    <input type="text" id="endpointInput" placeholder="Enter Prediction Endpoint URL">
+    <input type="text" id="keyInput" placeholder="Enter Prediction Key">
+    <button id="setCredentials">Set Credentials</button>
+
+    <h2>Upload Image</h2>
+    <input type="file" id="imageInput" accept="image/*">
+    <label for="imageInput">Choose Image</label>
+
+    <h2>OR Enter Image URL</h2>
+    <div class="url-box">
+      <input type="text" id="imageURLInput" placeholder="Enter image URL here">
+      <button id="urlSubmit">Classify URL</button>
+    </div>
+
+    <img id="preview" src="" alt="Preview Image">
+  </div>
+
+  <!-- Right: Prediction Results -->
+  <div class="right">
+    <h2>Prediction Results</h2>
+    <div class="result-card" id="result">Prediction will appear here</div>
+  </div>
+</div>
+
+<footer>🌱 Made for Environmental Awareness & Recycling 🌱</footer>
+
+<script>
+let predictionUrlFile = "";
+let predictionUrl = "";
+let predictionKey = "";
+
+// Elements
+const endpointInput = document.getElementById("endpointInput");
+const keyInput = document.getElementById("keyInput");
+const setCredentials = document.getElementById("setCredentials");
+const imageInput = document.getElementById("imageInput");
+const urlInput = document.getElementById("imageURLInput");
+const urlSubmit = document.getElementById("urlSubmit");
+const preview = document.getElementById("preview");
+const resultDiv = document.getElementById("result");
+
+// Set user-provided credentials
+setCredentials.addEventListener("click", () => {
+  const endpoint = endpointInput.value.trim();
+  const key = keyInput.value.trim();
+  if(!endpoint || !key){
+    alert("Please enter both Endpoint URL and Prediction Key!");
+    return;
+  }
+  predictionKey = key;
+  predictionUrlFile = `${endpoint}/customvision/v3.0/Prediction/YOUR_PROJECT_ID/classify/iterations/YOUR_ITERATION_NAME/image`;
+  predictionUrl = `${endpoint}/customvision/v3.0/Prediction/YOUR_PROJECT_ID/classify/iterations/YOUR_ITERATION_NAME/url`;
+  alert("Credentials set! You can now classify images.");
+});
+
+// Show predictions
+function showPrediction(data){
+  if(data.predictions && data.predictions.length > 0){
+    let html = "";
+    data.predictions.forEach(pred => {
+      const percent = (pred.probability * 100).toFixed(2);
+      const icon = pred.tagName.toLowerCase() === "recyclable" ? "♻️" : "🚫";
+      html += `<div class="prediction">
+                 <span>${icon} ${pred.tagName}</span>
+                 <div class="confidence-bar">
+                   <div class="confidence-fill" style="width:${percent}%">${percent}%</div>
+                 </div>
+               </div>`;
+    });
+    resultDiv.innerHTML = html;
+  } else {
+    resultDiv.textContent = "No prediction returned.";
+  }
+}
+
+// Local file upload
+imageInput.addEventListener("change", () => {
+  const file = imageInput.files[0];
+  if(!file) return;
+  preview.src = URL.createObjectURL(file);
+  resultDiv.textContent = "Classifying... 🌿";
+
+  const reader = new FileReader();
+  reader.onload = function() {
+    const arrayBuffer = reader.result;
+    fetch(predictionUrlFile, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        "Prediction-Key": predictionKey
+      },
+      body: arrayBuffer
+    })
+    .then(resp => resp.json())
+    .then(data => showPrediction(data))
+    .catch(err => { resultDiv.textContent = "Error predicting image."; console.error(err); });
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+// URL input
+urlSubmit.addEventListener("click", () => {
+  const imageUrl = urlInput.value.trim();
+  if(!imageUrl) return;
+  preview.src = imageUrl;
+  resultDiv.textContent = "Classifying... 🌿";
+
+  fetch(predictionUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Prediction-Key": predictionKey
+    },
+    body: JSON.stringify({ "Url": imageUrl })
+  })
+  .then(resp => resp.json())
+  .then(data => showPrediction(data))
+  .catch(err => { resultDiv.textContent = "Error predicting image."; console.error(err); });
+});
+</script>
+
+</body>
+</html>
